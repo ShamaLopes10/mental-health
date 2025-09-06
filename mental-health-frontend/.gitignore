@@ -21,3 +21,14 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+
+Mental-health support.env 
+
+PORT=5001 # Or any other port, different from your React app
+JWT_SECRET='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyMywidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTc0NzcyODc5OSwiZXhwIjoxNzQ3NzMyMzk5fQ.90HWzFQsIV9ly0VYU5OgAuFm9GZYVCswWB661u2zB0o'
+DB_USER='postgres'
+DB_PASS='sam@201'
+DB_NAME='support_group_db'
+DB_HOST='localhost'
