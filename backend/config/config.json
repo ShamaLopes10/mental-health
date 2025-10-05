@@ -1,11 +1,11 @@
 {
  "development": {
     "username": "postgres", 
-    "password": "sam@201", 
+    "password": "shamalopes", 
     "database": "support_group_db", 
-    "host": "localhost",
+    "host": "127.0.0.1",
     "dialect": "postgres",
-    "port": "5433"
+    "port": 5432
   },
   "test": {
     "username": "root",

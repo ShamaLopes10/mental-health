@@ -1,187 +1,223 @@
 // src/components/Auth/Login.js
-import React, { useState, useEffect } from "react"; // Added useEffect
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useAuth } from "../../contexts/authContext"; // VERIFY THIS PATH
+import { useAuth } from "../../contexts/authContext"; // Import AuthContext
+import loginbg from "../../assets/img/loginbg.jpg";
 
-const Login = () => {
-  const navigate = useNavigate();
-  const { login, isAuthenticated, loading: authContextLoading } = useAuth(); // Get login, isAuthenticated, and loading state
+function Login() {
+  const { login } = useAuth(); // Use login from context
+  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // useEffect to handle navigation AFTER authentication state is confirmed
-  useEffect(() => {
-    // console.log(`[Login.js] useEffect triggered: isAuthenticated=${isAuthenticated}, authContextLoading=${authContextLoading}`);
-    // Only navigate if:
-    // 1. The user is actually authenticated.
-    // 2. The authentication process (in AuthContext) is no longer loading.
-    // 3. We are not currently in the middle of a form submission (isSubmitting is false).
-    //    This last check prevents potential navigation loops if login fails then quickly succeeds,
-    //    or if the component re-renders for other reasons while still technically "submitting".
-    if (isAuthenticated && !authContextLoading && !isSubmitting) {
-      // console.log("[Login.js] useEffect: Navigating to /home as user is authenticated and context is not loading.");
-      navigate("/home", { replace: true });
-    }
-  }, [isAuthenticated, authContextLoading, navigate, isSubmitting]); // Dependencies for the effect
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
-    setIsSubmitting(true);
+
     try {
-      // console.log("[Login.js] handleLogin: Calling await login()...");
-      await login(email, password); // Call login from context
-      // console.log("[Login.js] handleLogin: login() call finished. Navigation will be handled by useEffect.");
-      // No direct navigation here; useEffect will handle it when isAuthenticated becomes true.
-      // If login fails, an error will be thrown by auth.login() and caught below.
-      // If login succeeds, AuthContext updates isAuthenticated, triggering the useEffect.
+      await login(email, password); // Use context login
+      navigate("/home");            // Redirect after successful login
     } catch (err) {
-      // console.error("[Login.js] handleLogin error:", err);
-      const errorMsg =
-        err.response?.data?.errors?.[0]?.msg ||
-        err.response?.data?.msg ||
-        err.message ||
-        "Login failed. Please check your credentials or try again later.";
-      setError(errorMsg);
-      // setIsSubmitting will be set to false in the finally block
-    } finally {
-      // Set isSubmitting to false here regardless of success or failure,
-      // so the useEffect can make a clean decision if it runs again.
-      setIsSubmitting(false);
+      console.error("Login error:", err);
+      setError("Login failed. Try again."); // Generic error
     }
   };
 
   return (
-    <Container>
-      <Form onSubmit={handleLogin}>
-        <h1>Login</h1>
-        {error && <Error>{error}</Error>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isSubmitting}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isSubmitting}
-          required
-        />
-        <button type="submit" disabled={isSubmitting || authContextLoading}> {/* Also disable if context is loading */}
-          {isSubmitting || authContextLoading ? "Processing..." : "Login"}
-        </button>
-        <p>
-          Don't have an account?{" "}
-          <Link to="/signup" className="styled-link">Register</Link>
-        </p>
-      </Form>
-    </Container>
+    <Wrapper>
+      <Container>
+        {/* Left Form Section */}
+        <FormSection>
+          <FormWrapper>
+            <h2>Welcome Back</h2>
+            <p>Please login to continue</p>
+
+            {error && <Error>{error}</Error>}
+
+            <form onSubmit={handleLogin}>
+              <InputWrapper>
+                <span className="icon">📧</span>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </InputWrapper>
+              <InputWrapper>
+                <span className="icon">🔒</span>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </InputWrapper>
+
+              <Options>
+                <label>
+                  <input type="checkbox" /> Remember me
+                </label>
+                <a href="/forgot-password">Forgot Password?</a>
+              </Options>
+
+              <button type="submit">Login</button>
+
+              <p>
+                Don’t have an account? <a href="/signup">Register</a>
+              </p>
+            </form>
+          </FormWrapper>
+        </FormSection>
+
+        {/* Right Image Section */}
+        <ImageSection />
+      </Container>
+    </Wrapper>
   );
-};
+}
 
 export default Login;
 
-// Styled Components (remain the same)
-const Container = styled.div`
+// Styled Components
+const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f6f1f1;
-  padding: 1rem;
+  height: 100vh;
+  background: #e9ecef;
+  padding: 6mm;
 `;
 
-const Form = styled.form`
-  background-color: #afd3e2;
-  padding: 2rem 3rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
+const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  color: #333333;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+`;
 
-  h1 {
-    margin-bottom: 1.5rem;
-    text-align: center;
-    color: #146c94;
+const FormSection = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #fdfdfd 0%, #f4f6f9 100%);
+`;
+
+const FormWrapper = styled.div`
+  width: 80%;
+  max-width: 380px;
+
+  h2 {
+    margin-bottom: 0.5rem;
     font-size: 2rem;
-  }
-
-  input {
-    padding: 0.85rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    &:focus {
-      outline: none;
-      border-color: #19a7ce;
-      box-shadow: 0 0 0 2px rgba(25, 167, 206, 0.2);
-    }
-  }
-
-  button {
-    padding: 0.85rem;
-    background-color: #19a7ce;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 0.5rem;
-
-    &:hover {
-      background-color: #146c94;
-    }
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
+    color: var(--accent-dark);
   }
 
   p {
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-    text-align: center;
+    margin-bottom: 2rem;
+    color: #555;
+  }
 
-    .styled-link {
-      color: #19a7ce;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: bold;
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-      &:hover {
-        color: #146c94;
-        text-decoration: underline;
-      }
+  button {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
     }
+  }
+
+  p a {
+    color: var(--violet);
+    font-weight: bold;
+    text-decoration: underline;
+  }
+`;
+
+const ImageSection = styled.div`
+  flex: 1.2;
+  background: url(${loginbg}) no-repeat center center/cover;
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: var(--accent-dark);
+  }
+
+  input {
+    width: 100%;
+    height: 50px;
+    padding: 0 1rem 0 2.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--muted);
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus {
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 2px rgba(113, 192, 187, 0.2);
+  }
+`;
+
+const Options = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #555;
+
+  a {
+    color: var(--violet);
+    font-weight: 600;
+    text-decoration: none;
   }
 `;
 
 const Error = styled.div`
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
-  border-left: 4px solid #d32f2f;
-  padding: 0.75rem;
+  background: rgba(255, 0, 0, 0.08);
+  padding: 0.6rem;
+  border-radius: 8px;
   margin-bottom: 1rem;
-  font-size: 0.9rem;
-  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #b71c1c;
+  border-left: 4px solid #d32f2f;
 `;

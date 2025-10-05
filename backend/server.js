@@ -1,8 +1,10 @@
 require('dotenv').config();
+console.log("JWT Secret:", process.env.JWT_SECRET);
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
 const db = require('./models'); // Sequelize models
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.use(cors({
 }));
 app.use(express.json()); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+
+app.use('/api/auth', authRoutes);
 
 // Passport Middleware
 app.use(passport.initialize());
@@ -30,6 +34,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 // app.use('/api/tasks', require('./routes/taskRoutes'));
 // app.use('/api/content', require('./routes/contentRoutes'));
 
+app.use("/api/tasks", require("./routes/tasks"));
 app.use('/api/moodlogs', require('./routes/moodLogRoutes'));
 app.use('/api/content', require('./routes/contentRoutes'));
 app.use('/api/recommendations', require('./routes/recommendationRoutes'));

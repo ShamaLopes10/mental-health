@@ -1,10 +1,12 @@
 // src/components/Auth/Signup.js
-
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { FaUser, FaLock, FaEnvelope, FaGoogle } from "react-icons/fa";
+import loginbg from "../../assets/img/loginbg.jpg";
 
-const Signup = () => {
+function Signup() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -15,209 +17,268 @@ const Signup = () => {
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ 
-      ...formData, 
-      [e.target.name]: e.target.value 
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-
     const { name, email, password, confirmPassword } = formData;
 
     if (!name || !email || !password || !confirmPassword) {
       setError("Please fill out all fields.");
       return;
     }
-
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    // Simulate success
-    console.log("Signed up:", formData);
-    navigate("/home");
+    try {
+    const res = await axios.post("http://localhost:5001/api/auth/register", {
+      username: name, // backend expects username
+      email,
+      password,
+    });
+    console.log(res.data); // token + user
+    navigate("/login");    // go to login page after successful signup
+  } catch (err) {
+    setError(err.response?.data?.errors[0]?.msg || "Signup failed");
+  }
+  };
+
+  const handleGoogleSignup = () => {
+    console.log("Google signup clicked");
   };
 
   return (
-    <Container>
-      <Form onSubmit={handleSignup}>
-        <h1>Sign Up</h1>
-        {error && <Error>{error}</Error>}
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Create Password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-        />
-        <button type="submit">Sign Up</button>
-        <p>
-          Already have an account?{" "}
-          <span onClick={() => navigate("/login")}>Login</span>
-        </p>
-      </Form>
-    </Container>
+    <Wrapper>
+      <Container>
+        {/* Left Form Section */}
+        <FormSection>
+          <FormWrapper>
+            <h2>Sign Up</h2>
+            <p>Create your account to get started</p>
+
+            {error && <Error>{error}</Error>}
+
+            <form onSubmit={handleSignup}>
+              <InputWrapper>
+                <FaUser className="icon" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </InputWrapper>
+
+              <InputWrapper>
+                <FaEnvelope className="icon" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </InputWrapper>
+
+              <InputWrapper>
+                <FaLock className="icon" />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </InputWrapper>
+
+              <InputWrapper>
+                <FaLock className="icon" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+              </InputWrapper>
+
+              <PrimaryButton type="submit">SIGN UP</PrimaryButton>
+
+              <GoogleButton type="button" onClick={handleGoogleSignup}>
+                <FaGoogle className="gicon" /> Sign up with Google
+              </GoogleButton>
+
+              <p className="below">
+                Already have an account?{" "}
+                <span className="link" onClick={() => navigate("/login")}>
+                  Login
+                </span>
+              </p>
+            </form>
+          </FormWrapper>
+        </FormSection>
+
+        {/* Right Image Section */}
+        <ImageSection />
+      </Container>
+    </Wrapper>
   );
-};
+}
 
 export default Signup;
 
-// Styled Components
-const Container = styled.div`
+/* --------------------- STYLES --------------------- */
+const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f6f1f1; /* var(--color-bg) */
+  background: #e9ecef;
+  padding: 6mm;
 `;
 
-const Form = styled.form`
-  background-color: #afd3e2; /* var(--color-surface) */
-  padding: 2rem 3rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  width: 350px;
-  color: #333333; /* var(--color-text) */
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+`;
 
-  h1 {
-    margin-bottom: 1rem;
-    text-align: center;
-    color: #146c94; /* var(--color-accent) */
-  }
+const FormSection = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #fdfdfd 0%, #f4f6f9 100%);
+`;
 
-  input {
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-  }
+const FormWrapper = styled.div`
+  width: 80%;
+  max-width: 380px;
 
-  button {
-    padding: 0.75rem;
-    background-color: #19a7ce; /* var(--color-primary) */
-    border: none;
-    color: #ffffff; /* var(--color-light-text) */
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #146c94; /* var(--color-accent) */
-    }
+  h2 {
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    color: var(--accent-dark);
   }
 
   p {
+    margin-bottom: 2rem;
+    color: #555;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .below {
     margin-top: 1rem;
-    text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: #555;
+  }
 
-    span {
-      color: #19a7ce; /* var(--color-primary) */
-      cursor: pointer;
-
-      &:hover {
-        color: #146c94; /* var(--color-accent) */
-      }
-    }
+  .link {
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--violet);
   }
 `;
 
-const Error = styled.div`
-  background-color: #ffe5e5;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border-left: 5px solid #f44336;
-  font-size: 0.9rem;
-  color: #b71c1c;
+const InputWrapper = styled.div`
+  position: relative;
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: var(--accent-dark);
+  }
+
+  input {
+    width: 100%;
+    height: 50px;
+    padding: 0 1rem 0 2.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--muted);
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus {
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 2px rgba(113, 192, 187, 0.2);
+  }
 `;
 
-// src/components/Auth/Signup.js
-// import React, { useState } from 'react';
-// import { useAuth } from '../../contexts/authContext'; // Adjust path if needed
-// import { useNavigate } from 'react-router-dom'; // For redirection
+const PrimaryButton = styled.button`
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-// function Signup() {
-//     const [formData, setFormData] = useState({
-//         username: '',
-//         email: '',
-//         password: '',
-//         confirmPassword: ''
-//     });
-//     const [error, setError] = useState('');
-//     const { signup } = useAuth();
-//     const navigate = useNavigate();
+  &:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  }
+`;
 
-//     const { username, email, password, confirmPassword } = formData;
+const GoogleButton = styled.button`
+  width: 100%;
+  height: 50px;
+  margin-top: 0.5rem;
+  background: #f78da7;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border: none;
 
-//     const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  &:hover {
+    background: #ec407a;
+  }
+`;
 
-//     const onSubmit = async e => {
-//         e.preventDefault();
-//         setError('');
-//         if (password !== confirmPassword) {
-//             setError('Passwords do not match');
-//             return;
-//         }
-//         try {
-//             await signup(username, email, password);
-//             navigate('/home'); // Or your dashboard route
-//         } catch (err) {
-//             // Assuming error response from backend is { errors: [{msg: ...}] } or just a message
-//             const errorMsg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.msg || 'Registration failed. Please try again.';
-//             setError(errorMsg);
-//             console.error(err);
-//         }
-//     };
+const ImageSection = styled.div`
+  flex: 1.2;
+  background: url(${loginbg}) no-repeat center center/cover;
+`;
 
-//     return (
-//         <div>
-//             <h2>Sign Up</h2>
-//             {error && <p style={{ color: 'red' }}>{error}</p>}
-//             <form onSubmit={onSubmit}>
-//                 <div>
-//                     <input type="text" placeholder="Username" name="username" value={username} onChange={onChange} required />
-//                 </div>
-//                 <div>
-//                     <input type="email" placeholder="Email Address" name="email" value={email} onChange={onChange} required />
-//                 </div>
-//                 <div>
-//                     <input type="password" placeholder="Password" name="password" value={password} onChange={onChange} minLength="6" required />
-//                 </div>
-//                 <div>
-//                     <input type="password" placeholder="Confirm Password" name="confirmPassword" value={confirmPassword} onChange={onChange} minLength="6" required />
-//                 </div>
-//                 <input type="submit" value="Register" />
-//             </form>
-//         </div>
-//     );
-// }
-
-// export default Signup;
+const Error = styled.div`
+  background: rgba(255, 0, 0, 0.08);
+  padding: 0.6rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #b71c1c;
+  border-left: 4px solid #d32f2f;
+`;

@@ -80,7 +80,7 @@ const SymptomSelector = styled.div`
       background-color: #d0d0d0;
     }
     &.selected {
-      background-color: #19a7ce; /* Primary color */
+      background-color: rgba(139, 75, 131, 1); /* Primary color */
       color: white;
     }
   }
@@ -96,7 +96,7 @@ const TextArea = styled.textarea`
   box-sizing: border-box;
   &:focus {
     outline: none;
-    border-color: #19a7ce;
+    border-color: rgb(199, 121, 190);
     box-shadow: 0 0 0 2px rgba(25, 167, 206, 0.2);
   }
 `;
@@ -104,7 +104,7 @@ const TextArea = styled.textarea`
 const SubmitButton = styled.button`
   /* Use styles similar to your AddTaskForm SubmitButton or Login button */
   padding: 0.85rem 1.5rem;
-  background-color: #19a7ce;
+  background-color: rgb(199, 121, 190);
   color: white;
   border: none;
   border-radius: 8px;
@@ -114,7 +114,7 @@ const SubmitButton = styled.button`
   transition: background-color 0.3s ease;
   display: block; /* Make it block to center with margin */
   margin: 1rem auto 0;
-  &:hover { background-color: #146c94; }
+  &:hover { background-color: rgba(139, 75, 131, 1); }
   &:disabled { background-color: #ccc; cursor: not-allowed; }
 `;
 
@@ -192,14 +192,14 @@ const MoodLogForm = ({ onMoodLogged }) => {
         <MoodRatingSelector>
           {MOOD_OPTIONS.map(opt => (
             <button
-  type="button"
-  key={opt.value}
-  className={moodRating === opt.value ? 'selected' : ''}
-  onClick={() => setMoodRating(opt.value)}
-  title={opt.label.substring(opt.label.charAt(0).length).trim()} // Text part
->
-  {opt.label.charAt(0)} {/* Emoji part */}
-</button>
+              type="button"
+              key={opt.value}
+              className={moodRating === opt.value ? 'selected' : ''}
+              onClick={() => setMoodRating(opt.value)}
+              title={opt.label.substring(opt.label.charAt(0).length).trim()} // Text part
+            >
+              {opt.label.charAt(0)} {/* Emoji part */}
+            </button>
           ))}
         </MoodRatingSelector>
       </FormGroup>

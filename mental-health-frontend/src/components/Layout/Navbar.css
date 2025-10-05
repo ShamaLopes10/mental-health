@@ -1,138 +1,34 @@
-/* App.css or Navbar.css */
-
-.app-navbar {
-  background-color: #ffffff; /* White background for a clean look */
-  padding: 1rem 2rem;      /* Vertical and horizontal padding */
+.navbar-hero {
   display: flex;
-  justify-content: space-between; /* Puts brand on left, links on right */
+  justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  position: sticky; /* Makes the navbar stick to the top on scroll */
+  padding: 1rem 2rem;
+  width: 100%;
+  position: absolute; /* Float over hero */
   top: 0;
-  z-index: 1000; /* Ensures it's above other content */
-  width: 100%;
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  left: 0;
+  z-index: 10;
 }
 
-.nav-brand {
-  font-size: 1.8rem;    /* Larger brand name */
-  font-weight: 700;     /* Bolder */
-  text-decoration: none;
-  color: #146c94;       /* Your accent color */
-  transition: color 0.3s ease;
+.navbar-hero .brand {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
 }
 
-.nav-brand:hover {
-  color: #19a7ce;       /* Your primary color on hover */
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem; /* Space between nav items */
-}
-
-.nav-links a,
-.nav-links .nav-user-greeting { /* Target greeting specifically if it's a span */
-  text-decoration: none;
-  color: #333333;       /* Dark grey for text */
-  font-weight: 500;     /* Medium weight */
-  padding: 0.5rem 0;    /* Some padding for better click area, only vertical */
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-  color: #19a7ce;       /* Primary color on hover */
-}
-
-/* Optional: Add an underline effect on hover for links */
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #19a7ce;
-  transition: width 0.3s ease;
-}
-
-.nav-links a:hover::after {
-  width: 100%;
-}
-
-
-.nav-user-greeting {
-  color: #555555;       /* Slightly lighter grey for greeting */
-  font-style: italic;
-  margin-right: 0.5rem; /* Space before logout button */
-}
-
-.nav-logout-button {
-  background-color: #19a7ce; /* Primary color */
-  color: #ffffff;
+.navbar-hero nav button {
+  margin-left: 1rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
   border: none;
-  padding: 0.6rem 1.2rem; /* Padding for the button */
-  border-radius: 20px;   /* More rounded button */
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transition: all 0.3s ease;
 }
 
-.nav-logout-button:hover {
-  background-color: #146c94; /* Accent color on hover */
-  transform: translateY(-1px); /* Slight lift effect */
-}
-
-.nav-logout-button:active {
-  transform: translateY(0px); /* Press down effect */
-}
-
-.nav-links-loading { /* Style for the "Loading nav..." text */
-  font-style: italic;
-  color: #777777;
-}
-
-/* Responsive adjustments (optional, but recommended) */
-@media (max-width: 768px) {
-  .app-navbar {
-    padding: 1rem; /* Reduce padding on smaller screens */
-    flex-direction: column; /* Stack brand and links vertically */
-    align-items: flex-start; /* Align items to the start */
-  }
-
-  .nav-brand {
-    margin-bottom: 0.5rem; /* Add space below brand when stacked */
-  }
-
-  .nav-links {
-    width: 100%; /* Make links take full width */
-    flex-direction: column; /* Stack nav items */
-    align-items: flex-start; /* Align items to start */
-    gap: 0.5rem; /* Reduce gap */
-  }
-
-  .nav-links a,
-  .nav-links .nav-user-greeting,
-  .nav-links .nav-logout-button {
-    margin-left: 0; /* Remove left margin when stacked */
-    width: 100%; /* Make each link/button take full width */
-    text-align: left; /* Align text to left */
-    padding: 0.75rem 0; /* Adjust padding for vertical layout */
-  }
-
-  .nav-links a::after { /* Adjust underline for stacked layout if needed */
-    left: 0;
-    transform: translateX(0);
-  }
-   .nav-links a:hover::after {
-    width: 50px; /* Or a fixed width for the underline */
-  }
-
-  .nav-user-greeting {
-    margin-right: 0;
-    margin-bottom: 0.5rem; /* Space below greeting */
-  }
+.navbar-hero nav button:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #000;
 }

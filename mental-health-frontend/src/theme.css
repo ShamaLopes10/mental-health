@@ -1,29 +1,12 @@
-/* src/theme.css */
-/* :root {
-  --color-bg: #F6F1F1;
-  --color-surface: #AFD3E2;
-  --color-primary: #19A7CE;
-  --color-text: #146C94;
-  --color-text-light: #ffffff;
-  --color-border: #ddd;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #1a1a1a;
-    --color-surface: #333;
-    --color-primary: #19A7CE;
-    --color-text: #f6f6f6;
-    --color-text-light: #ffffff;
-    --color-border: #444;
-  }
-} */
-
 :root {
-  --color-bg: #332D56;
-  --color-surface: #4E6688;
-  --color-primary: #71C0BB;
-  --color-accent: #E3EEB2;
-  --color-text: #333333;
+  --color-bg: #f8f9fb;       /* soft off-white */
+  --color-surface: #ffffff;  /* clean white cards */
+  --color-primary: #6c63ff;  /* calming purple */
+  --color-accent: #00bfa6;   /* teal for highlights */
+  --color-text: #333333;     /* dark readable text */
   --color-light-text: #ffffff;
+  --color-border: #e0e0e0;
+  --color-shadow: rgba(0, 0, 0, 0.08);
+  --radius: 16px;
+  --transition: all 0.3s ease;
 }

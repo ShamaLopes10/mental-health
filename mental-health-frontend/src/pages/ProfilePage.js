@@ -1,10 +1,12 @@
 // src/pages/ProfilePage.js
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { useAuth } from '../contexts/authContext'; // Adjust path
-import { getProfile, updateProfile } from '../utils/api'; // Adjust path
+import { useAuth } from '../contexts/authContext';
+import { getProfile, updateProfile } from '../utils/api';
+import NavBar from "../components/NavBar";
+import bgImg from '../assets/img/bg.jpg'; // background image
 
-// Define options for multi-selects (can be moved to a constants file)
+// Options
 const AREAS_OF_CONCERN_OPTIONS = [
     "anxiety", "stress", "depression", "sleep", "motivation",
     "focus", "relationships", "self-esteem", "grief", "anger", "burnout"
@@ -17,30 +19,38 @@ const CONTENT_TYPE_OPTIONS = [
 ];
 
 // --- Styled Components ---
-const PageContainer = styled.div`
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  width: 100%;
+  padding: 3rem 1rem;
+  background: url(${bgImg}) center/cover no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+`;
+
+const GlassContainer = styled.div`
+  width: 100%;
   max-width: 700px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.32);
+  padding: 2.5rem 2rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.12);
 `;
 
 const Title = styled.h1`
   text-align: center;
-  color: #146c94;
-  margin-bottom: 2rem;
+  color: #6B1E77; /* consistent with Home */
+  margin-bottom: 1rem;
 `;
 
 const Form = styled.form``;
 
-const FormGroup = styled.div`
-  margin-bottom: 2rem;
-`;
+const FormGroup = styled.div`margin-bottom: 2rem;`;
 
 const Label = styled.label`
   display: block;
-  font-weight: 600; /* Bolder label */
+  font-weight: 600;
   margin-bottom: 0.75rem;
   color: #333;
   font-size: 1.05rem;
@@ -49,33 +59,33 @@ const Label = styled.label`
 const MultiSelectContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem; /* Spacing between buttons */
+  gap: 0.75rem;
 `;
 
 const ToggleButton = styled.button`
-  background-color: ${props => props.selected ? '#19a7ce' : '#e9ecef'};
+  background-color: ${props => props.selected ? 'rgb(199, 121, 190)' : '#e9ecef'};
   color: ${props => props.selected ? 'white' : '#495057'};
-  border: 1px solid ${props => props.selected ? '#19a7ce' : '#ced4da'};
+  border: 1px solid ${props => props.selected ? 'rgb(199, 121, 190)' : '#ced4da'};
   padding: 0.6rem 1.2rem;
-  border-radius: 20px; /* Pill shape */
+  border-radius: 20px;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-weight: 500;
 
   &:hover {
-    border-color: ${props => props.selected ? '#146c94' : '#adb5bd'};
-    background-color: ${props => props.selected ? '#146c94' : '#f8f9fa'};
+    border-color: ${props => props.selected ? 'rgba(139, 75, 131, 1)' : '#adb5bd'};
+    background-color: ${props => props.selected ? 'rgba(139, 75, 131, 1)' : '#f8f9fa'};
   }
 `;
 
 const SubmitButton = styled.button`
   display: block;
   width: 100%;
-  max-width: 250px; /* Max width for button */
-  margin: 2rem auto 0; /* Center button */
+  max-width: 250px;
+  margin: 2rem auto 0;
   padding: 0.9rem 1.5rem;
-  background-color: #19a7ce;
+  background-color: rgb(199, 121, 190);
   color: white;
   border: none;
   border-radius: 8px;
@@ -83,7 +93,7 @@ const SubmitButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  &:hover { background-color: #146c94; }
+  &:hover { background-color: rgba(139, 75, 131, 1); }
   &:disabled { background-color: #ccc; cursor: not-allowed; }
 `;
 
@@ -99,7 +109,7 @@ const Message = styled.p`
 // --- End Styled Components ---
 
 const ProfilePage = () => {
-  const { user, token } = useAuth(); // Assuming token is available for API calls
+  const { user, token } = useAuth();
   const [profileData, setProfileData] = useState({
     areas_of_concern: [],
     preferred_content_types: [],
@@ -110,11 +120,7 @@ const ProfilePage = () => {
   const [success, setSuccess] = useState('');
 
   const fetchUserProfile = useCallback(async () => {
-    if (!token) { // Ensure token exists before fetching
-        setLoading(false);
-        setError("You must be logged in to view your profile."); // Should be handled by ProtectedRoute
-        return;
-    }
+    if (!token) { setLoading(false); setError("You must be logged in."); return; }
     setLoading(true); setError('');
     try {
       const data = await getProfile();
@@ -123,16 +129,12 @@ const ProfilePage = () => {
         preferred_content_types: data.preferred_content_types || [],
       });
     } catch (err) {
-      setError("Failed to load your profile. Please try again later.");
+      setError("Failed to load profile.");
       console.error("Profile fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]); // Depend on token to re-fetch if user logs in/out
+    } finally { setLoading(false); }
+  }, [token]);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, [fetchUserProfile]);
+  useEffect(() => { fetchUserProfile(); }, [fetchUserProfile]);
 
   const handleToggleSelection = (field, value) => {
     setProfileData(prev => {
@@ -142,7 +144,7 @@ const ProfilePage = () => {
         : [...currentValues, value];
       return { ...prev, [field]: newValues };
     });
-    setSuccess(''); // Clear success message on any change before saving
+    setSuccess('');
   };
 
   const handleSubmit = async (e) => {
@@ -158,70 +160,63 @@ const ProfilePage = () => {
       setSuccess("Profile updated successfully!");
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      const errorMsg = err.response?.data?.msg || err.response?.data?.errors?.[0]?.msg || err.message || "Failed to update profile.";
+      const errorMsg = err.response?.data?.msg || err.message || "Failed to update profile.";
       setError(errorMsg);
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
-  if (loading) return <PageContainer><Title>Loading Your Profile...</Title></PageContainer>;
-  // Error during initial load
-  if (error && !profileData.areas_of_concern.length && !profileData.preferred_content_types.length) {
-    return <PageContainer><Title>Profile</Title><Message className="error">{error}</Message></PageContainer>;
-  }
-
+  if (!user) return null; // ProtectedRoute should handle redirect
+  if (loading) return <PageWrapper><GlassContainer><Title>Loading Profile...</Title></GlassContainer></PageWrapper>;
 
   return (
-    <PageContainer>
-      <Title>Your Profile & Preferences</Title>
-      <p style={{textAlign: 'center', marginBottom: '2rem', color: '#555'}}>
-        Help us personalize your experience by selecting your areas of interest and preferred content types.
-      </p>
-      {/* Display error from save attempt, not initial load error if data is present */}
-      {error && (profileData.areas_of_concern.length > 0 || profileData.preferred_content_types.length > 0) &&
-        <Message className="error">{error}</Message>
-      }
-      {success && <Message className="success">{success}</Message>}
+    <PageWrapper>
+      <GlassContainer>
+        <Title>Your Profile & Preferences</Title>
+        <p style={{textAlign: 'center', marginBottom: '2rem', color: '#555'}}>
+          Help us personalize your experience by selecting your areas of interest and preferred content types.
+        </p>
+        {error && <Message className="error">{error}</Message>}
+        {success && <Message className="success">{success}</Message>}
 
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label>What areas are you focusing on for your well-being?</Label>
-          <MultiSelectContainer>
-            {AREAS_OF_CONCERN_OPTIONS.map(area => (
-              <ToggleButton
-                type="button"
-                key={area}
-                selected={profileData.areas_of_concern.includes(area)}
-                onClick={() => handleToggleSelection('areas_of_concern', area)}
-              >
-                {area.charAt(0).toUpperCase() + area.slice(1)}
-              </ToggleButton>
-            ))}
-          </MultiSelectContainer>
-        </FormGroup>
+        <Form onSubmit={handleSubmit}>
+          <FormGroup>
+            <Label>What areas are you focusing on for your well-being?</Label>
+            <MultiSelectContainer>
+              {AREAS_OF_CONCERN_OPTIONS.map(area => (
+                <ToggleButton
+                  type="button"
+                  key={area}
+                  selected={profileData.areas_of_concern.includes(area)}
+                  onClick={() => handleToggleSelection('areas_of_concern', area)}
+                >
+                  {area.charAt(0).toUpperCase() + area.slice(1)}
+                </ToggleButton>
+              ))}
+            </MultiSelectContainer>
+          </FormGroup>
 
-        <FormGroup>
-          <Label>What types of resources do you prefer?</Label>
-          <MultiSelectContainer>
-            {CONTENT_TYPE_OPTIONS.map(opt => (
-              <ToggleButton
-                type="button"
-                key={opt.value}
-                selected={profileData.preferred_content_types.includes(opt.value)}
-                onClick={() => handleToggleSelection('preferred_content_types', opt.value)}
-              >
-                {opt.label}
-              </ToggleButton>
-            ))}
-          </MultiSelectContainer>
-        </FormGroup>
+          <FormGroup>
+            <Label>What types of resources do you prefer?</Label>
+            <MultiSelectContainer>
+              {CONTENT_TYPE_OPTIONS.map(opt => (
+                <ToggleButton
+                  type="button"
+                  key={opt.value}
+                  selected={profileData.preferred_content_types.includes(opt.value)}
+                  onClick={() => handleToggleSelection('preferred_content_types', opt.value)}
+                >
+                  {opt.label}
+                </ToggleButton>
+              ))}
+            </MultiSelectContainer>
+          </FormGroup>
 
-        <SubmitButton type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save Preferences"}
-        </SubmitButton>
-      </Form>
-    </PageContainer>
+          <SubmitButton type="submit" disabled={saving}>
+            {saving ? "Saving..." : "Save Preferences"}
+          </SubmitButton>
+        </Form>
+      </GlassContainer>
+    </PageWrapper>
   );
 };
 
