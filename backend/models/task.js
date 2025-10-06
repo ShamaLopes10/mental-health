@@ -1,4 +1,3 @@
-// models/task.js
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Task = sequelize.define('Task', {
@@ -11,13 +10,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: [], 
       field: 'moodtags'
     },
-    
-    // remove createdAt/updatedAt from here
   }, {
     tableName: 'Tasks',
     timestamps: true,
-    createdAt: 'createdat',  // map Sequelize createdAt to DB createdat
-    updatedAt: 'updatedat',  // map Sequelize updatedAt to DB updatedat
+    createdAt: 'createdat',
+    updatedAt: 'updatedat',
     underscored: true
   });
 

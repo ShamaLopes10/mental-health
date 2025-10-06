@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from './contexts/authContext';
 import { setAuthToken } from "./utils/api";
+import { AuthProvider } from "./contexts/authContext";
 
 // Component imports
 import Login from "./components/Auth/Login";
@@ -53,6 +54,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <AuthProvider>
       <NavBar />
       <Routes>
         {/* Public Routes */}
@@ -77,6 +79,7 @@ function App() {
           element={isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/" replace />}
         />
       </Routes>
+      </AuthProvider>
     </div>
   );
 }

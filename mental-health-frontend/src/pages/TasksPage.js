@@ -1,15 +1,13 @@
-// src/pages/TasksPage.js
 import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/authContext';
-import { getTasks, completeTask, getMyTaskStats, setAuthToken } from '../utils/api';
+import { getTasks, completeTask, getProfile, setAuthToken } from '../utils/api';
 import bgImg from '../assets/img/bg.jpg';
 
-// --- styled components (responsive) ---
 const PageContainer = styled.div`
-  width: 100%
+  width: 100%;
   max-width: 1100px;
-  height: 100%
+  height: 100%;
   margin: 1.5rem auto;
   padding: 1rem;
   background: url(${bgImg}) center/cover no-repeat;
@@ -95,7 +93,6 @@ const InfoBar = styled.div`
   color:#333;
 `;
 
-// --- component ---
 const TasksPage = () => {
   const { isAuthenticated, loading: authLoading, token, user } = useAuth();
   const [tasks, setTasks] = useState([]);
@@ -104,16 +101,15 @@ const TasksPage = () => {
   const [filterMood, setFilterMood] = useState('');
   const [search, setSearch] = useState('');
   const [userStats, setUserStats] = useState({ points: 0, currentStreak: 0, longestStreak: 0 });
-  const [completing, setCompleting] = useState({}); // map taskId->bool
+  const [completing, setCompleting] = useState({});
 
   const loadStats = useCallback(async () => {
     try {
-      const res = await getMyTaskStats();
-      // res.user (has points and streak fields)
+      const res = await getProfile();
       setUserStats({
-        points: res.user?.points || 0,
-        currentStreak: res.user?.currentStreak || 0,
-        longestStreak: res.user?.longestStreak || 0
+        points: res?.points || 0,
+        currentStreak: res?.currentStreak || 0,
+        longestStreak: res?.longestStreak || 0,
       });
     } catch (err) {
       console.error('stats error', err);
@@ -137,86 +133,82 @@ const TasksPage = () => {
     }
   }, [filterMood, search]);
 
-  useEffect(() => {
-    // Make sure token is set for apiClient
-    if (token) setAuthToken(token);
-  }, [token]);
+  useEffect(() => { if (token) setAuthToken(token); }, [token]);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      loadStats();
-      loadTasks();
-    }
-  }, [authLoading, isAuthenticated, loadStats, loadTasks]);
+    getProfile().then(res => {
+      setUserStats({
+        points: res?.points || 0,
+        currentStreak: res?.currentStreak || 0,
+        longestStreak: res?.longestStreak || 0
+      });
+    });
+  }, []);
+
+  useEffect(() => { if (!authLoading && isAuthenticated) { loadStats(); loadTasks(); } }, [authLoading, isAuthenticated, loadStats, loadTasks]);
 
   const handleComplete = async (taskId) => {
     setCompleting(prev => ({ ...prev, [taskId]: true }));
+    const task = tasks.find(t => t.id === taskId);
     try {
       const res = await completeTask(taskId);
-      // update UI optimistically
       setUserStats(prev => ({
-        ...prev,
-        points: res.updated.points ?? prev.points,
+        points: prev.points + (task?.points || 0),
         currentStreak: res.updated.currentStreak ?? prev.currentStreak,
         longestStreak: res.updated.longestStreak ?? prev.longestStreak
       }));
-      // Optionally visually mark task as completed for the day
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, justCompleted: true } : t));
-      // show a small popup/toast (you can replace with your toast system)
-      alert(`Nice! +${ /* find points */ (tasks.find(t=>t.id===taskId)?.points || 0) } points earned`);
+      alert(`Nice! +${task?.points || 0} points earned`);
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.msg || 'Failed to complete task.');
     } finally {
       setCompleting(prev => ({ ...prev, [taskId]: false }));
-      loadStats();
     }
   };
 
   return (
-    <>
-      <PageContainer>
-        <Header>
-          <Title>Tasks — Active, short practices</Title>
-          <Stats>
-            <div>Points: <strong>{userStats.points}</strong></div>
-            <div>Streak: <strong>{userStats.currentStreak}🔥</strong></div>
-          </Stats>
-        </Header>
+    <PageContainer>
+      <Header>
+        <Title>Tasks — Active, short practices</Title>
+        <Stats>
+          <div>Points: <strong>{userStats.points}</strong></div>
+          <div>Streak: <strong>{userStats.currentStreak}🔥</strong></div>
+        </Stats>
+      </Header>
 
-        <FilterRow>
-          <Input placeholder="Filter mood (e.g. stress, sadness)" value={filterMood} onChange={(e)=>setFilterMood(e.target.value)} />
-          <Input placeholder="Search tasks" value={search} onChange={(e)=>setSearch(e.target.value)} />
-          <Btn onClick={loadTasks}>Filter</Btn>
-          <Btn onClick={() => { setFilterMood(''); setSearch(''); loadTasks(); }}>Clear</Btn>
-        </FilterRow>
+      <FilterRow>
+        <Input placeholder="Filter mood (e.g. stress, sadness)" value={filterMood} onChange={(e)=>setFilterMood(e.target.value)} />
+        <Input placeholder="Search tasks" value={search} onChange={(e)=>setSearch(e.target.value)} />
+        <Btn onClick={loadTasks}>Filter</Btn>
+        <Btn onClick={() => { setFilterMood(''); setSearch(''); loadTasks(); }}>Clear</Btn>
+      </FilterRow>
 
-        {loading && <div>Loading tasks...</div>}
-        {error && <InfoBar style={{background:'#ffe9e9', color:'#b71c1c'}}>{error}</InfoBar>}
+      {loading && <div>Loading tasks...</div>}
+      {error && <InfoBar style={{background:'#ffe9e9', color:'#b71c1c'}}>{error}</InfoBar>}
 
-        <TaskGrid>
-          {tasks.map(t => (
-            <TaskCard key={t.id}>
-              <div>
-                <TaskTitle>{t.title}</TaskTitle>
-                <Tags>{(t.moodTags || []).join(', ')}</Tags>
-                <TaskDesc>{t.description}</TaskDesc>
-              </div>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'1rem'}}>
-                <div style={{fontSize:'0.9rem', color:'#666'}}>Points: {t.points ?? 10}</div>
-                <Btn disabled={completing[t.id] || t.justCompleted} onClick={() => handleComplete(t.id)}>
-                  {t.justCompleted ? 'Completed' : (completing[t.id] ? 'Saving...' : 'Done')}
-                </Btn>
-              </div>
-            </TaskCard>
-          ))}
-        </TaskGrid>
+      <TaskGrid>
+        {tasks.map(t => (
+          <TaskCard key={t.id}>
+            <div>
+              <TaskTitle>{t.title}</TaskTitle>
+              <Tags>{(t.moodTags || []).join(', ')}</Tags>
+              <TaskDesc>{t.description}</TaskDesc>
+            </div>
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'1rem'}}>
+              <div style={{fontSize:'0.9rem', color:'#666'}}>Points: {t.points ?? 10}</div>
+              <Btn disabled={completing[t.id] || t.justCompleted} onClick={() => handleComplete(t.id)}>
+                {t.justCompleted ? 'Completed' : (completing[t.id] ? 'Saving...' : 'Done')}
+              </Btn>
+            </div>
+          </TaskCard>
+        ))}
+      </TaskGrid>
 
-        <InfoBar>
-          Tip: complete at least one short task a day to keep your streak.
-        </InfoBar>
-      </PageContainer>
-    </>
+      <InfoBar>
+        Tip: complete at least one short task a day to keep your streak.
+      </InfoBar>
+    </PageContainer>
   );
 };
 

@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     if (!storedUser) return null;
-    try {
+     try {
       return JSON.parse(storedUser);
     } catch (err) {
       console.error("Error parsing user from localStorage:", err);

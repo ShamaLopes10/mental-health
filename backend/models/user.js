@@ -18,12 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     underscored: false
   });
 
-  // Instance method for password validation
   User.prototype.isValidPassword = async function(password) {
     return await bcrypt.compare(password, this.password);
   };
 
-  // Instance method to get last 20 completed tasks
   User.prototype.getLastCompletedTasks = async function() {
     const { UserTask } = sequelize.models;
     return await UserTask.findAll({

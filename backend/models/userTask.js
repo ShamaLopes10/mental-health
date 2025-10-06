@@ -5,11 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     taskid: { type: DataTypes.INTEGER, allowNull: false, field: 'taskid' },
     completedat: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
 }, {
-  tableName: 'UserTasks',
-  timespace: true,  // actual table name
-  underscored: true      // optional: maps createdAt/updatedAt to createdat/updatedat
-});
-
+    tableName: 'UserTasks',
+    timestamps: false
+  });
 
   UserTask.associate = function(models) {
     UserTask.belongsTo(models.User, { foreignKey: 'userid' });

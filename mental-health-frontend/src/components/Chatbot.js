@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FaPaperPlane } from "react-icons/fa";
 import bgImg from '../assets/img/bg.jpg';
+import { useAuth } from "../contexts/authContext"; // Adjust path if needed
 
 const ChatWrapper = styled.div`
   width: 100%;
@@ -72,8 +73,19 @@ const SendButton = styled.button`
   }
 `;
 
-const Chatbot = ({ userId }) => {
-  const [messages, setMessages] = useState([]);
+const Chatbot = () => {
+  const { user } = useAuth(); // Get logged-in user
+  const userId = user?.id;
+  const greetedKey = `greeted_${user?.id}`;
+  const hasBeenGreeted = localStorage.getItem(greetedKey);
+
+
+  const [messages, setMessages] = useState(() => {
+    if (!userId) return [];
+    const saved = localStorage.getItem(`chatMessages_${userId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
@@ -81,6 +93,31 @@ const Chatbot = ({ userId }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Save messages to localStorage per user
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem(`chatMessages_${userId}`, JSON.stringify(messages));
+    }
+  }, [messages, userId]);
+
+  useEffect(() => {
+    if (user && !hasBeenGreeted) {
+      const welcomeMessage = {
+        text: `Hi ${user.username}! How are you feeling today? 😊`,
+        isUser: false,
+      };
+
+      setMessages((prev) => [...prev, welcomeMessage]);
+      localStorage.setItem(greetedKey, "true");
+    }
+  }, [user]);
+
+
+  // If no user, show prompt
+  if (!userId) {
+    return <p>Please log in to access the chatbot.</p>;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
