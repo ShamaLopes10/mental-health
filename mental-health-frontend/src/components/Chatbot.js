@@ -1,7 +1,155 @@
-import React from "react";
+// src/components/Chatbot/Chatbot.js
+import React, { useState, useEffect, useRef } from "react";
+import styled from "styled-components";
+import { FaPaperPlane } from "react-icons/fa";
+import bgImg from '../assets/img/bg.jpg';
 
-const Chatbot = () => {
-  return <div>Chatbot Coming Soon...</div>;
+const ChatWrapper = styled.div`
+  width: 100%;
+  max-width: 700px;
+  background: url(${bgImg}) center/cover no-repeat;
+  margin: 0 auto;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  font-family: "Helvetica", sans-serif;
+`;
+
+const MessagesContainer = styled.div`
+  flex: 1;
+  padding: 16px;
+  background: #f7f7f8;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const Message = styled.div`
+  max-width: 80%;
+  align-self: ${props => (props.isUser ? "flex-end" : "flex-start")};
+  background: ${props => (props.isUser ? "#10a37f" : "#fff")};
+  color: ${props => (props.isUser ? "#fff" : "#000")};
+  padding: 12px 16px;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  word-wrap: break-word;
+`;
+
+const InputContainer = styled.form`
+  display: flex;
+  padding: 12px;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+`;
+
+const Input = styled.input`
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 16px;
+`;
+
+const SendButton = styled.button`
+  margin-left: 8px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 50%;
+  background-color: #10a37f;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #0e8a6f;
+  }
+`;
+
+const Chatbot = ({ userId }) => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const messagesEndRef = useRef(null);
+
+  // Scroll to bottom on new message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage = { text: input, isUser: true };
+    setMessages((prev) => [...prev, userMessage]);
+
+    const sse = new EventSource(
+      `http://localhost:5000/chat_stream?user_id=${userId}&message=${encodeURIComponent(input)}`
+    );
+
+    let botMessage = { text: "", isUser: false };
+    setMessages((prev) => [...prev, botMessage]);
+
+    sse.onmessage = (event) => {
+      if (event.data === "[DONE]") {
+        sse.close();
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = botMessage;
+          return updated;
+        });
+      } else {
+        botMessage.text += (botMessage.text ? " " : "") + event.data;
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { ...botMessage };
+          return updated;
+        });
+      }
+    };
+
+    sse.onerror = () => {
+      sse.close();
+      botMessage.text = "Oops! Something went wrong.";
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = botMessage;
+        return updated;
+      });
+    };
+
+    setInput("");
+  };
+
+  return (
+    <ChatWrapper>
+      <MessagesContainer>
+        {messages.map((msg, idx) => (
+          <Message key={idx} isUser={msg.isUser}>
+            {msg.text}
+          </Message>
+        ))}
+        <div ref={messagesEndRef} />
+      </MessagesContainer>
+      <InputContainer onSubmit={handleSubmit}>
+        <Input
+          type="text"
+          placeholder="Type a message..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <SendButton type="submit">
+          <FaPaperPlane />
+        </SendButton>
+      </InputContainer>
+    </ChatWrapper>
+  );
 };
 
 export default Chatbot;

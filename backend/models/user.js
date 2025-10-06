@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'Users',   // exact table name
     timestamps: true,
-    underscored: true
+    underscored: false
   });
 
   // Instance method for password validation
