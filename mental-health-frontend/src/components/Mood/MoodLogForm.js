@@ -1,24 +1,21 @@
 // src/components/Mood/MoodLogForm.js
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { createMoodLog } from '../../utils/api'; // Adjust path
+import { createMoodLog } from '../../utils/api';
 
-// Define your mood scale and available symptoms
-// Define your mood scale and available symptoms
 const MOOD_OPTIONS = [
-    { value: 1, label: '\u{1F622} Very Poor' },    // 😔 Pensive Face
-    { value: 2, label: '\u{1F641} Poor' },         // 🙁 Slightly Frowning Face
-    { value: 3, label: '\u{1F610} Okay' },        // 😐 Neutral Face
-    { value: 4, label: '\u{1F642} Good' },        // 🙂 Slightly Smiling Face
-    { value: 5, label: '\u{1F60A} Very Good' },    // 😊 Smiling Face with Smiling Eyes
+  { value: 1, label: "😭" },
+  { value: 2, label: "😞" },
+  { value: 3, label: "😐" },
+  { value: 4, label: "😊" },
+  { value: 5, label: "😄" },
 ];
 
 const AVAILABLE_SYMPTOMS = [
-    "anxious", "stressed", "irritable", "sad", "lonely", "tired",
-    "low_energy", "unmotivated", "overwhelmed", "restless", "calm",
-    "happy", "energetic", "focused", "grateful", "hopeful"
+  "anxious", "stressed", "irritable", "sad", "lonely", "tired",
+  "low_energy", "unmotivated", "overwhelmed", "restless", "calm",
+  "happy", "energetic", "focused", "grateful", "hopeful"
 ];
-// You can expand this list or fetch it from an API later
 
 const FormContainer = styled.form`
   background-color: #f9f9f9;
@@ -28,9 +25,7 @@ const FormContainer = styled.form`
   margin-bottom: 2rem;
 `;
 
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
+const FormGroup = styled.div`margin-bottom: 1.5rem;`;
 
 const Label = styled.label`
   display: block;
@@ -43,6 +38,7 @@ const MoodRatingSelector = styled.div`
   display: flex;
   justify-content: space-around;
   margin-bottom: 1rem;
+
   button {
     background: none;
     border: 2px solid #ddd;
@@ -50,16 +46,11 @@ const MoodRatingSelector = styled.div`
     padding: 0.5rem 0.8rem;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 1.5rem; /* Emoji size */
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+    font-size: 1.8rem; /* Increased emoji size */
+    font-family: "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji",sans-serif;
     transition: transform 0.2s, border-color 0.2s;
-    &:hover {
-      transform: scale(1.1);
-    }
-    &.selected {
-      border-color: #19a7ce; /* Primary color */
-      background-color: #e0f7fa; /* Light primary tint */
-    }
+    &:hover { transform: scale(1.1); }
+    &.selected { border-color: #f04beaff; background-color: #e9c2edff; }
   }
 `;
 
@@ -76,13 +67,8 @@ const SymptomSelector = styled.div`
     font-size: 0.9rem;
     cursor: pointer;
     transition: background-color 0.2s;
-    &:hover {
-      background-color: #d0d0d0;
-    }
-    &.selected {
-      background-color: rgba(139, 75, 131, 1); /* Primary color */
-      color: white;
-    }
+    &:hover { background-color: #d0d0d0; }
+    &.selected { background-color: rgba(139, 75, 131, 1); color: white; }
   }
 `;
 
@@ -94,15 +80,10 @@ const TextArea = styled.textarea`
   font-size: 1rem;
   min-height: 80px;
   box-sizing: border-box;
-  &:focus {
-    outline: none;
-    border-color: rgb(199, 121, 190);
-    box-shadow: 0 0 0 2px rgba(25, 167, 206, 0.2);
-  }
+  &:focus { outline: none; border-color: rgb(199, 121, 190); box-shadow: 0 0 0 2px rgba(25, 167, 206, 0.2); }
 `;
 
 const SubmitButton = styled.button`
-  /* Use styles similar to your AddTaskForm SubmitButton or Login button */
   padding: 0.85rem 1.5rem;
   background-color: rgb(199, 121, 190);
   color: white;
@@ -112,26 +93,26 @@ const SubmitButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  display: block; /* Make it block to center with margin */
+  display: block;
   margin: 1rem auto 0;
   &:hover { background-color: rgba(139, 75, 131, 1); }
   &:disabled { background-color: #ccc; cursor: not-allowed; }
 `;
 
-const ErrorMessage = styled.p` /* Similar to your Login.js Error styled component */
+const ErrorMessage = styled.p`
   background-color: #ffebee; color: #c62828; border: 1px solid #ef9a9a;
   border-left: 4px solid #d32f2f; padding: 0.75rem; margin-bottom: 1rem;
   font-size: 0.9rem; border-radius: 4px;
 `;
- const SuccessMessage = styled.p`
+
+const SuccessMessage = styled.p`
   background-color: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7;
   border-left: 4px solid #43a047; padding: 0.75rem; margin-bottom: 1rem;
   font-size: 0.9rem; border-radius: 4px;
 `;
 
-
 const MoodLogForm = ({ onMoodLogged }) => {
-  const [moodRating, setMoodRating] = useState(null); // Start with null, require selection
+  const [moodRating, setMoodRating] = useState(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
@@ -139,47 +120,29 @@ const MoodLogForm = ({ onMoodLogged }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSymptomToggle = (symptom) => {
-    setSelectedSymptoms(prev =>
-      prev.includes(symptom)
-        ? prev.filter(s => s !== symptom)
-        : [...prev, symptom]
-    );
+    setSelectedSymptoms(prev => prev.includes(symptom) ? prev.filter(s => s !== symptom) : [...prev, symptom]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-
-    if (moodRating === null) {
-      setError("Please select your current mood rating.");
-      return;
-    }
+    if (moodRating === null) { setError("Please select your current mood rating."); return; }
     setIsSubmitting(true);
     try {
-      const moodLogData = {
-        moodRating,
-        symptoms: selectedSymptoms,
-        notes,
-        // loggedAt: new Date().toISOString() // Or let backend default
-      };
+      const moodLogData = { moodRating, symptoms: selectedSymptoms, notes };
       await createMoodLog(moodLogData);
       setSuccess('Mood logged successfully!');
-      // Reset form
       setMoodRating(null);
       setSelectedSymptoms([]);
       setNotes('');
-      if (onMoodLogged) { // Callback to parent component (e.g., to refresh a list of logs)
-        onMoodLogged();
-      }
-      setTimeout(() => setSuccess(''), 3000); // Clear success message
+      if (onMoodLogged) onMoodLogged();
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       const errorMsg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.msg || err.message || "Failed to log mood.";
       setError(errorMsg);
       console.error("Failed to log mood from form:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
+    } finally { setIsSubmitting(false); }
   };
 
   return (
@@ -196,9 +159,9 @@ const MoodLogForm = ({ onMoodLogged }) => {
               key={opt.value}
               className={moodRating === opt.value ? 'selected' : ''}
               onClick={() => setMoodRating(opt.value)}
-              title={opt.label.substring(opt.label.charAt(0).length).trim()} // Text part
+              title={opt.label} // full text on hover
             >
-              {opt.label.charAt(0)} {/* Emoji part */}
+              {opt.label} {/* emoji + text */}
             </button>
           ))}
         </MoodRatingSelector>

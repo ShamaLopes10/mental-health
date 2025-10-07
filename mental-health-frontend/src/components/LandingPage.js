@@ -132,19 +132,20 @@ const LandingPage = () => {
       <section id="mission" className="section mission">
         <div className="container">
           <h3 className="section-heading">Our Mission</h3>
-          <p>
-            MindSpace empowers people to better understand and manage their mental health by
-            blending evidence-based psychoeducation, accessible self-help tools, and compassionate
-            digital support. We believe early awareness, learning, and community reduce stigma and
-            open pathways to care. Through data-informed personalization and human-centered design,
-            our mission is to make effective mental health resources available to everyone,
-            everywhere — helping people build resilience, coping skills, and hope.
-          </p>
-          <p>
-            We prioritize safety, transparency, and dignity — delivering tools that guide users toward
-            real-world help when needed, while supporting daily wellbeing practices that prevent
-            deterioration and promote growth.
-          </p>
+<p>
+  MindSpace is dedicated to transforming the way people understand and care for their mental health.  
+  Our mission is to create a safe, inclusive, and intelligent space where technology and empathy come together  
+  to support emotional wellbeing. Through AI-driven mood tracking, personalized self-care recommendations,  
+  and real-time mental health insights, we empower individuals to take control of their mental wellness journey.
+</p>
+
+<p>
+  We believe that early awareness, open conversations, and community support can break the stigma surrounding  
+  mental health. MindSpace integrates tools like mood detection, guided activities and personalized resource recommendations to make help more accessible and human-centered.  
+  Our goal is to nurture resilience, build coping skills, and promote lasting emotional growth —  
+  helping people feel understood, supported, and never alone.
+</p>
+
         </div>
       </section>
 
@@ -161,7 +162,7 @@ const LandingPage = () => {
               and connect them to appropriate help when necessary.
             </p>
             <p>
-              By combining proven psychoeducation, mood-tracking, supportive peer spaces, and
+              By combining proven psychoeducation, mood-tracking, and
               an empathetic conversational assistant, MindSpace aims to make mental health care
               proactive and inclusive — so everyone has tools to stay well and recover when needed.
             </p>
@@ -183,9 +184,9 @@ const LandingPage = () => {
               <p>An empathetic AI companion offering CBT-style support and mood-aware suggestions.</p>
             </div>
             <div className="card">
-              <div className="card-icon">👥</div>
-              <h4>Peer Support Groups</h4>
-              <p>Safe, moderated anonymous groups that foster connection and reduce isolation.</p>
+              <div className="card-icon">📝</div>
+                <h4>Daily Mood Log</h4>
+               <p>Track your emotions, thoughts, and triggers each day to build self-awareness and notice mental health patterns over time.</p>
             </div>
             <div className="card">
               <div className="card-icon">📚</div>
@@ -203,29 +204,31 @@ const LandingPage = () => {
 
       {/* EDUCATION / CDC */}
       <section id="education" className="section education">
-        <div className="container">
-          <h3 className="section-heading">Why Mental Health Education Is Important</h3>
-        </div>
-        <div className="container education-grid">
-          <div className="edu-text">
-            <blockquote className="edu-quote">
-              “Teaching mental health lessons in school can reduce stigma and improve students’
-              knowledge and attitudes about mental health. Students are also more likely to ask for help.”
-            </blockquote>
-            <p className="edu-source">Center for Disease Control and Prevention</p>
-            <p>
-              According to the CDC, a mental health education program should include:
-            </p>
-            <ul className="edu-list">
-              <li>Teaching about mental health, emotional distress, and causes & symptoms of illnesses.</li>
-              <li>Describing stigma and practical ways to reduce it.</li>
-              <li>Emphasizing that mental illnesses are treatable and recovery is possible.</li>
-              <li>Encouraging help-seeking and trusted adult conversations.</li>
-            </ul>
-            <p className="edu-cta">Get started with MindSpace — learn, practice, and reach out.</p>
-          </div>
-        </div>
-      </section>
+  <div className="container">
+    <h3 className="section-heading">Why Mental Health Awareness Matters</h3>
+  </div>
+  <div className="container education-grid">
+    <div className="edu-text">
+      <blockquote className="edu-quote">
+        “Understanding mental health is the first step toward healing. Awareness empowers people to
+        manage emotions, seek help early, and support others with empathy.”
+      </blockquote>
+      <p className="edu-source">MindSpace Initiative</p>
+      <p>
+        At MindSpace, we believe mental health education should empower individuals to build resilience
+        and emotional intelligence. A meaningful program includes:
+      </p>
+      <ul className="edu-list">
+        <li>Learning about emotional wellbeing, common stressors, and healthy coping strategies.</li>
+        <li>Recognizing signs of mental distress and knowing when to seek help.</li>
+        <li>Challenging stigma by encouraging open, judgment-free conversations.</li>
+        <li>Developing daily habits — like mood logging and self-care — to maintain balance and prevent burnout.</li>
+      </ul>
+      <p className="edu-cta">Start your journey with MindSpace — reflect, learn, and grow every day.</p>
+    </div>
+  </div>
+</section>
+
 
       {/* PRIORITIES */}
       <section id="priorities" className="section priorities">
@@ -250,8 +253,8 @@ const LandingPage = () => {
               <p className="reveal">Reduce incidence of mental illness through early intervention and support.</p>
             </div>
             <div className="priority-card" tabIndex="0">
-              <h4>Foster</h4>
-              <p className="reveal">Build peer support and strengthen community engagement.</p>
+              <h4>Reflect</h4>
+              <p className="reveal">Encourage daily self-reflection to understand emotions, build resilience, and nurture mental wellbeing.</p>
             </div>
           </div>
         </div>

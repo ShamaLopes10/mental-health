@@ -6,19 +6,15 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
     const savedToken = localStorage.getItem('token');
-    if (savedToken) setAuthToken(savedToken); // set token for all API requests
+    if (savedToken) setAuthToken(savedToken);
     return savedToken;
   });
 
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     if (!storedUser) return null;
-     try {
-      return JSON.parse(storedUser);
-    } catch (err) {
-      console.error("Error parsing user from localStorage:", err);
-      return null;
-    }
+    try { return JSON.parse(storedUser); } 
+    catch (err) { console.error("Error parsing user:", err); return null; }
   });
 
   const [loading, setLoading] = useState(true);
@@ -35,23 +31,12 @@ export const AuthProvider = ({ children }) => {
     const currentToken = localStorage.getItem('token');
     const currentUser = localStorage.getItem('user');
 
-    if (currentToken) {
+    if (currentToken && currentUser) {
       setAuthToken(currentToken);
       setToken(currentToken);
-
-      if (currentUser) {
-        try {
-          setUser(JSON.parse(currentUser));
-        } catch (err) {
-          console.error("Error parsing user from localStorage:", err);
-          logout();
-        }
-      } else {
-        logout();
-      }
-    } else {
-      logout();
-    }
+      try { setUser(JSON.parse(currentUser)); } 
+      catch { logout(); }
+    } else { logout(); }
 
     setLoading(false);
   }, [logout]);
@@ -71,39 +56,43 @@ export const AuthProvider = ({ children }) => {
       }
       throw new Error("Invalid server response");
     } catch (err) {
-      console.error("Login error:", err);
       setLoading(false);
-      logout();
-      throw err;
+      const msg = err.response?.data?.errors?.[0]?.msg 
+                  || err.response?.data?.msg 
+                  || err.message 
+                  || "Login failed";
+      throw new Error(msg);
     }
   };
 
-  const signup = async (username, email, password) => {
+  const signup = async (username, email, password, autoLogin = false) => {
     setLoading(true);
     try {
       const data = await apiRegisterUser({ username, email, password });
-      if (data?.token && data?.user) {
+      if (!data?.token || !data?.user) throw new Error("Invalid server response");
+
+      if (autoLogin) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setAuthToken(data.token);
         setToken(data.token);
         setUser(data.user);
-        setLoading(false);
-        return data.user;
       }
-      throw new Error("Invalid server response");
-    } catch (err) {
-      console.error("Signup error:", err);
+
       setLoading(false);
-      logout();
-      throw err;
+      return data.user;
+    } catch (err) {
+      setLoading(false);
+      const msg = err.response?.data?.errors?.[0]?.msg 
+                  || err.response?.data?.msg 
+                  || err.message 
+                  || "Signup failed";
+      throw new Error(msg);
     }
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, token, login, signup, logout, loading, isAuthenticated: !!user && !!token }}
-    >
+    <AuthContext.Provider value={{ user, token, login, signup, logout, loading, isAuthenticated: !!user && !!token }}>
       {!loading ? children : null}
     </AuthContext.Provider>
   );

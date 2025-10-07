@@ -1,132 +1,62 @@
 // src/components/Auth/Signup.js
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { FaUser, FaLock, FaEnvelope, FaGoogle } from "react-icons/fa";
+import { useAuth } from "../../contexts/authContext";
 import loginbg from "../../assets/img/loginbg.jpg";
 
 function Signup() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const { signup } = useAuth();
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setError("");
     const { name, email, password, confirmPassword } = formData;
-
-    if (!name || !email || !password || !confirmPassword) {
-      setError("Please fill out all fields.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+    if (!name || !email || !password || !confirmPassword) { setError("Please fill out all fields."); return; }
+    if (password !== confirmPassword) { setError("Passwords do not match."); return; }
 
     try {
-    const res = await axios.post("http://localhost:5001/api/auth/register", {
-      username: name, // backend expects username
-      email,
-      password,
-    });
-    console.log(res.data); // token + user
-    navigate("/login");    // go to login page after successful signup
-  } catch (err) {
-    setError(err.response?.data?.errors[0]?.msg || "Signup failed");
-  }
-  };
-
-  const handleGoogleSignup = () => {
-    console.log("Google signup clicked");
+      await signup(name, email, password, true); // auto-login after signup
+      navigate("/home");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
     <Wrapper>
       <Container>
-        {/* Left Form Section */}
         <FormSection>
           <FormWrapper>
             <h2>Sign Up</h2>
             <p>Create your account to get started</p>
-
             {error && <Error>{error}</Error>}
 
             <form onSubmit={handleSignup}>
               <InputWrapper>
-                <FaUser className="icon" />
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
               </InputWrapper>
-
               <InputWrapper>
-                <FaEnvelope className="icon" />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
               </InputWrapper>
-
               <InputWrapper>
-                <FaLock className="icon" />
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
               </InputWrapper>
-
               <InputWrapper>
-                <FaLock className="icon" />
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm Password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
               </InputWrapper>
 
               <PrimaryButton type="submit">SIGN UP</PrimaryButton>
 
-              <GoogleButton type="button" onClick={handleGoogleSignup}>
-                <FaGoogle className="gicon" /> Sign up with Google
-              </GoogleButton>
-
-              <p className="below">
-                Already have an account?{" "}
-                <span className="link" onClick={() => navigate("/login")}>
-                  Login
-                </span>
-              </p>
+              <p className="below">Already have an account? <span className="link" onClick={() => navigate("/login")}>Login</span></p>
             </form>
           </FormWrapper>
         </FormSection>
-
-        {/* Right Image Section */}
         <ImageSection />
       </Container>
     </Wrapper>
@@ -134,6 +64,9 @@ function Signup() {
 }
 
 export default Signup;
+
+/* Styled components remain similar to your previous code */
+
 
 /* --------------------- STYLES --------------------- */
 const Wrapper = styled.div`

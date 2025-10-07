@@ -3,26 +3,35 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FaPaperPlane } from "react-icons/fa";
 import bgImg from '../assets/img/bg.jpg';
-import { useAuth } from "../contexts/authContext"; // Adjust path if needed
+import { useAuth } from "../contexts/authContext";
+
+const PageWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  background: url(${bgImg}) center/cover no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+`;
 
 const ChatWrapper = styled.div`
   width: 100%;
   max-width: 700px;
-  background: url(${bgImg}) center/cover no-repeat;
-  margin: 0 auto;
-  height: 80vh;
+  height: 80%;
   display: flex;
   flex-direction: column;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.85); // light overlay so text is readable
   font-family: "Helvetica", sans-serif;
 `;
 
 const MessagesContainer = styled.div`
   flex: 1;
   padding: 16px;
-  background: #f7f7f8;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -32,7 +41,7 @@ const MessagesContainer = styled.div`
 const Message = styled.div`
   max-width: 80%;
   align-self: ${props => (props.isUser ? "flex-end" : "flex-start")};
-  background: ${props => (props.isUser ? "#10a37f" : "#fff")};
+  background: ${props => (props.isUser ? "#852575ff" : "#fff")};
   color: ${props => (props.isUser ? "#fff" : "#000")};
   padding: 12px 16px;
   border-radius: 20px;
@@ -61,7 +70,7 @@ const SendButton = styled.button`
   padding: 0 16px;
   border: none;
   border-radius: 50%;
-  background-color: #10a37f;
+  background-color: #ab0a98ff;
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -69,16 +78,15 @@ const SendButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background-color: #0e8a6f;
+    background-color: #9f2795ff;
   }
 `;
 
 const Chatbot = () => {
-  const { user } = useAuth(); // Get logged-in user
+  const { user } = useAuth();
   const userId = user?.id;
   const greetedKey = `greeted_${user?.id}`;
   const hasBeenGreeted = localStorage.getItem(greetedKey);
-
 
   const [messages, setMessages] = useState(() => {
     if (!userId) return [];
@@ -89,12 +97,10 @@ const Chatbot = () => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
-  // Scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Save messages to localStorage per user
   useEffect(() => {
     if (userId) {
       localStorage.setItem(`chatMessages_${userId}`, JSON.stringify(messages));
@@ -107,14 +113,11 @@ const Chatbot = () => {
         text: `Hi ${user.username}! How are you feeling today? 😊`,
         isUser: false,
       };
-
       setMessages((prev) => [...prev, welcomeMessage]);
       localStorage.setItem(greetedKey, "true");
     }
   }, [user]);
 
-
-  // If no user, show prompt
   if (!userId) {
     return <p>Please log in to access the chatbot.</p>;
   }
@@ -165,27 +168,29 @@ const Chatbot = () => {
   };
 
   return (
-    <ChatWrapper>
-      <MessagesContainer>
-        {messages.map((msg, idx) => (
-          <Message key={idx} isUser={msg.isUser}>
-            {msg.text}
-          </Message>
-        ))}
-        <div ref={messagesEndRef} />
-      </MessagesContainer>
-      <InputContainer onSubmit={handleSubmit}>
-        <Input
-          type="text"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <SendButton type="submit">
-          <FaPaperPlane />
-        </SendButton>
-      </InputContainer>
-    </ChatWrapper>
+    <PageWrapper>
+      <ChatWrapper>
+        <MessagesContainer>
+          {messages.map((msg, idx) => (
+            <Message key={idx} isUser={msg.isUser}>
+              {msg.text}
+            </Message>
+          ))}
+          <div ref={messagesEndRef} />
+        </MessagesContainer>
+        <InputContainer onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            placeholder="Type a message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <SendButton type="submit">
+            <FaPaperPlane />
+          </SendButton>
+        </InputContainer>
+      </ChatWrapper>
+    </PageWrapper>
   );
 };
 

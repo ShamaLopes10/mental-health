@@ -2,84 +2,55 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useAuth } from "../../contexts/authContext"; // Import AuthContext
+import { useAuth } from "../../contexts/authContext";
 import loginbg from "../../assets/img/loginbg.jpg";
 
 function Login() {
-  const { login } = useAuth(); // Use login from context
-  const [error, setError] = useState("");
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (!email || !password) {
-      setError("Please enter both email and password.");
-      return;
-    }
+    if (!email || !password) { setError("Please enter both email and password."); return; }
 
     try {
-      await login(email, password); // Use context login
-      navigate("/home");            // Redirect after successful login
+      await login(email, password);
+      navigate("/home"); // redirect on success
     } catch (err) {
-      console.error("Login error:", err);
-      setError("Login failed. Try again."); // Generic error
+      setError(err.message); // show backend message if any
     }
   };
 
   return (
     <Wrapper>
       <Container>
-        {/* Left Form Section */}
         <FormSection>
           <FormWrapper>
             <h2>Welcome Back</h2>
             <p>Please login to continue</p>
-
             {error && <Error>{error}</Error>}
 
             <form onSubmit={handleLogin}>
               <InputWrapper>
                 <span className="icon">📧</span>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </InputWrapper>
-              <InputWrapper>
-                <span className="icon">🔒</span>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
               </InputWrapper>
 
-              <Options>
-                <label>
-                  <input type="checkbox" /> Remember me
-                </label>
-                <a href="/forgot-password">Forgot Password?</a>
-              </Options>
+              <InputWrapper>
+                <span className="icon">🔒</span>
+                <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+              </InputWrapper>
 
               <button type="submit">Login</button>
 
-              <p>
-                Don’t have an account? <a href="/signup">Register</a>
-              </p>
+              <p>Don’t have an account? <a href="/signup">Register</a></p>
             </form>
           </FormWrapper>
         </FormSection>
-
-        {/* Right Image Section */}
         <ImageSection />
       </Container>
     </Wrapper>
@@ -87,6 +58,9 @@ function Login() {
 }
 
 export default Login;
+
+/* Styled components remain similar to your previous code */
+
 
 // Styled Components
 const Wrapper = styled.div`
