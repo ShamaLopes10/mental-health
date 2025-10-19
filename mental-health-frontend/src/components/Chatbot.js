@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/authContext";
 
 const PageWrapper = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 90vh;
   background: url(${bgImg}) center/cover no-repeat;
   background-size: cover;
   display: flex;
@@ -19,7 +19,7 @@ const PageWrapper = styled.div`
 const ChatWrapper = styled.div`
   width: 100%;
   max-width: 700px;
-  height: 80%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   border-radius: 12px;

@@ -7,7 +7,7 @@ const authenticate = require('../middleware/authMiddleware');
 router.get('/', authenticate, async (req,res)=>{
   const { mood, search } = req.query;
   const where = {};
-  if(mood) where[Sequelize.literal(`"moodtags" @> ARRAY['${mood}']::text[]`)] = true
+  if(mood) where[sequelize.literal(`"moodtags" @> ARRAY['${mood}']::text[]`)] = true
   if(search) where.title = { [Op.iLike]: `%${search}%` };
 
   try {

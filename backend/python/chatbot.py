@@ -1,4 +1,3 @@
-# /python/chatbot.py 
 import os
 import time
 import google.generativeai as genai
@@ -18,7 +17,7 @@ app = Flask(__name__)
 CORS(app)  # Allows requests from your frontend
 
 # Configure Gemini API key
-genai.configure(api_key="AIzaSyA76PotFKNWQ27FINZYsk1K7UPk7DYtNek")
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 # --- Safety Settings ---
 safety_settings = [
@@ -74,7 +73,7 @@ def chat_stream():
     try:
         response = chat_session.send_message(
             user_message,
-            safety_settings=safety_settings
+            #safety_settings=safety_settings
         )
         bot_reply = response.text
 
